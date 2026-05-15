@@ -1,0 +1,8 @@
+node_modules/
+dist/
+# Keep environment variables out of version control
+.env
+compressed-roadmap-w2-w4.jsx
+/generated/prisma
+*.log
+.DS_Store
