@@ -1,0 +1,26 @@
+# Dependencies (semua subfolder)
+**/node_modules/
+
+# Environment — rahasia, jangan di-commit
+**/.env
+**/.env.local
+**/.env.*.local
+!**/.env.example
+
+# Build output
+**/dist/
+**/.next/
+**/out/
+**/build/
+
+# Prisma generated client
+**/generated/prisma
+
+# Log & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Catatan pribadi (opsional)
+roadmap.md
+todo-api/compressed-roadmap-w2-w4.jsx
