@@ -14,7 +14,17 @@ const prisma = new PrismaClient();
 
 const getAllTodos = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const todos = await prisma.todo.findMany();
+    // take all todos (parentId: null) root with its children
+    const todos = await prisma.todo.findMany({
+      where: { parentId: null },
+      include: {
+        children: {
+          include: {
+            children: true,
+          },
+        },
+      },
+    });
     res.json(todos);
   } catch (error) {
     next(error);

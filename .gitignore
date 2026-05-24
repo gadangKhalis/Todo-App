@@ -1,5 +1,6 @@
 # Dependencies (semua subfolder)
 **/node_modules/
+node_modules/
 
 # Environment — rahasia, jangan di-commit
 **/.env

@@ -19,4 +19,8 @@ model Todo {
   title     String
   done      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  parentId  Int?
+  parent    Todo? @relation("TodoTree", fields: [parentId], references: [id])
+  children  Todo[]  @relation("TodoTree")
 }
