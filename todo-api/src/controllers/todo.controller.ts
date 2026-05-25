@@ -32,15 +32,41 @@ const getAllTodos = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const createTodo = async (req: Request, res: Response, next: NextFunction) => {
-  const { title } = req.body;
+  const { title, parentId } = req.body;
+  console.log("body:", req.body); // ← tambah ini
+  console.log("parentId:", parentId); // ← tambah ini
+
   try {
     if (!title) {
       return res.status(400).json({ message: "Title must be provided" });
+    }
+    // validate max depth of 3
+    if (parentId) {
+      const parent = await prisma.todo.findUnique({
+        where: { id: parentId },
+      });
+      if (!parent) {
+        return res.status(404).json({ message: "Parent todo not found" });
+      }
+      if (parent.parentId !== null) {
+        const grandParent = await prisma.todo.findUnique({
+          where: { id: parent.parentId },
+        });
+        if (grandParent && grandParent.parentId !== null) {
+          return res
+            .status(400)
+            .json({ message: "Maximum depth of 3 level reached" });
+        }
+      }
     }
     const newTodo = await prisma.todo.create({
       data: {
         title: title,
         done: false,
+        parentId: parentId ?? null,
+      },
+      include: {
+        children: true,
       },
     });
     res.status(201).json(newTodo);
