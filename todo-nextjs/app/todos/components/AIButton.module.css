@@ -1,0 +1,15 @@
+.btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  background-color: #6366f1;
+  color: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btnLocked {
+  background-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
