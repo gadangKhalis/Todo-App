@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes";
 import todoRoutes from "./routes/todo.routes";
 import errorHandler from "./middlewares/errorHandler";
 import authMiddleware from "./middlewares/authMiddlewares";
+import premiumRoutes from "./routes/premium.routes";
 
 const app = express();
 app.use(
@@ -18,6 +19,7 @@ app.use(cookieParser());
 
 app.use("/auth", authRoutes);
 app.use("/todos", authMiddleware, todoRoutes); //protect all /todos
+app.use("/premium", premiumRoutes); //premium routes
 
 app.listen(3000, () => {
   console.log(`Server running at http://localhost:3000`);

@@ -11,7 +11,9 @@ model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
   password  String
+  isPremium Boolean   @default(false)
   createdAt DateTime  @default(now())
+  todos     Todo[]
 }
 
 model Todo {
@@ -19,8 +21,18 @@ model Todo {
   title     String
   done      Boolean  @default(false)
   createdAt DateTime @default(now())
+  dueDate   DateTime? 
+  priority  Priority?
+  userId    Int 
+  user      User      @relation(fields: [userId], references: [id])
 
   parentId  Int?
-  parent    Todo? @relation("TodoTree", fields: [parentId], references: [id])
+  parent    Todo?   @relation("TodoTree", fields: [parentId], references: [id])
   children  Todo[]  @relation("TodoTree")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
 }

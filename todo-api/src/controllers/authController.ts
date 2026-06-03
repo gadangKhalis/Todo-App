@@ -63,6 +63,20 @@ const login = async (req: Request, res: Response) => {
   res.json({ message: "Login Success" });
 };
 
+export const getMe = async (req: Request, res: Response) => {
+  const userId = (req as any).userId;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, isPremium: true },
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  res.json({ user });
+};
+
 const logout = (_req: Request, res: Response) => {
   // Clear cookie
   res.clearCookie("token");
