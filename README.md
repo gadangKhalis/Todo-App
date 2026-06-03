@@ -1,6 +1,6 @@
 # Todo App — Fullstack
 
-A fullstack Todo application with JWT authentication and nested task support, built with Express + TypeScript (backend) and Next.js App Router (frontend).
+A fullstack Todo application with JWT authentication, nested task support, premium system, filter & search, and due date & priority management. Built with Express + TypeScript (backend) and Next.js App Router (frontend).
 
 ---
 
@@ -41,6 +41,32 @@ A fullstack Todo application with JWT authentication and nested task support, bu
 - ✅ Nested tasks — up to 3 levels deep (todo → subtask → sub-subtask)
 - ✅ Collapse/expand children per todo item
 - ✅ Subtask count badge on each parent todo
+- ✅ Todos are isolated per user — each user only sees their own todos
+
+### Premium System
+
+- ✅ `isPremium` field per user — feature flag for gating premium features
+- ✅ `requirePremium` middleware — returns `403 Forbidden` for non-premium users
+- ✅ `GET /auth/me` endpoint — returns current user's premium status
+- ✅ Premium Badge UI — shows `⭐ Premium` or `Free` based on user status
+- ✅ AI Suggest button — locked for non-premium users with upgrade modal
+- ✅ Upgrade Modal — prompts non-premium users to upgrade
+
+### Filter & Search
+
+- ✅ Client-side search — filter todos by title keyword in real time
+- ✅ Status filter — All / Active / Done tabs
+- ✅ Combined filter + search — works simultaneously
+- ✅ Recursive tree filter — parent shown if any child matches
+- ✅ Empty state — shown when no results match
+
+### Due Date & Priority
+
+- ✅ Due date — optional deadline per todo, stored as `DateTime`
+- ✅ Priority — optional `LOW / MEDIUM / HIGH` enum per todo
+- ✅ Priority badge — color-coded (green / yellow / red)
+- ✅ Overdue detection — red label if due date has passed and todo is not done
+- ✅ Nullable fields — both due date and priority are optional
 
 ### UX & Performance
 
@@ -57,39 +83,44 @@ A fullstack Todo application with JWT authentication and nested task support, bu
 
 ```
 fullstack/
-├── todo-api/                        # Express + TypeScript backend
+├── todo-api/                           # Express + TypeScript backend
 │   ├── prisma/
-│   │   └── schema.prisma            # Database schema (User, Todo with self-relation)
+│   │   └── schema.prisma               # Database schema
 │   └── src/
 │       ├── controllers/
-│       │   ├── authController.ts    # register, login, logout
-│       │   └── todo.controller.ts   # CRUD todos with nested support
+│       │   ├── authController.ts       # register, login, logout, getMe
+│       │   └── todo.controller.ts      # CRUD todos with userId isolation
 │       ├── middlewares/
-│       │   ├── authMiddleware.ts    # JWT verification
-│       │   └── errorHandler.ts     # Global error handler
+│       │   ├── authMiddlewares.ts      # JWT verification
+│       │   ├── premiumMiddleware.ts    # isPremium check
+│       │   └── errorHandler.ts        # Global error handler
 │       ├── routes/
-│       │   ├── authRoutes.ts        # /auth/*
-│       │   └── todo.routes.ts       # /todos/*
-│       └── index.ts                 # Entry point
+│       │   ├── authRoutes.ts           # /auth/*
+│       │   ├── todo.routes.ts          # /todos/*
+│       │   └── premium.routes.ts       # /premium/*
+│       └── index.ts                    # Entry point
 │
-└── todo-nextjs/                     # Next.js frontend
+└── todo-nextjs/                        # Next.js frontend
     ├── app/
     │   ├── auth/
-    │   │   ├── login/
-    │   │   │   └── page.tsx         # Login form
-    │   │   └── register/
-    │   │       └── page.tsx         # Register form
+    │   │   ├── login/page.tsx          # Login form
+    │   │   └── register/page.tsx       # Register form
     │   └── todos/
-    │       ├── page.tsx             # Todos page (protected)
+    │       ├── page.tsx                # Todos page (protected)
     │       ├── hooks/
-    │       │   └── useToast.ts      # Toast notification hook
+    │       │   └── useToast.ts         # Toast notification hook
     │       └── components/
-    │           ├── TodoForm.tsx     # Add todo form
-    │           ├── TodoItem.tsx     # Recursive todo item component
-    │           └── Toast.tsx        # Toast notification component
+    │           ├── TodoForm.tsx        # Add todo form (title, date, priority)
+    │           ├── TodoItem.tsx        # Recursive todo item component
+    │           ├── Toast.tsx           # Toast notification component
+    │           ├── SearchBar.tsx       # Search input with clear button
+    │           ├── FilterTabs.tsx      # All / Active / Done filter tabs
+    │           ├── PremiumBadge.tsx    # Premium / Free status badge
+    │           ├── AIButton.tsx        # AI button (locked for non-premium)
+    │           └── UpgradeModal.tsx    # Upgrade to premium modal
     └── lib/
-        ├── authApi.ts               # login, register, logout API calls
-        └── todoApi.ts               # CRUD todos API calls
+        ├── authApi.ts                  # login, register, logout, getMe
+        └── todoApi.ts                  # CRUD todos API calls
 ```
 
 ---
@@ -151,61 +182,67 @@ npm run dev        # development (port 3001)
 
 ### Auth
 
-| Method | Endpoint         | Description                | Body                  |
-| ------ | ---------------- | -------------------------- | --------------------- |
-| POST   | `/auth/register` | Register new user          | `{ email, password }` |
-| POST   | `/auth/login`    | Login, set httpOnly cookie | `{ email, password }` |
-| POST   | `/auth/logout`   | Logout, clear cookie       | —                     |
+| Method | Endpoint         | Description                      | Body                  | Auth |
+| ------ | ---------------- | -------------------------------- | --------------------- | ---- |
+| POST   | `/auth/register` | Register new user                | `{ email, password }` | —    |
+| POST   | `/auth/login`    | Login, set httpOnly cookie       | `{ email, password }` | —    |
+| POST   | `/auth/logout`   | Logout, clear cookie             | —                     | —    |
+| GET    | `/auth/me`       | Get current user + isPremium     | —                     | ✅   |
 
 ### Todos
 
 > All endpoints require authentication (httpOnly cookie)
 
-| Method | Endpoint     | Description                             | Body                   |
-| ------ | ------------ | --------------------------------------- | ---------------------- |
-| GET    | `/todos`     | Get all root todos with nested children | —                      |
-| POST   | `/todos`     | Create todo or subtask                  | `{ title, parentId? }` |
-| PATCH  | `/todos/:id` | Update todo                             | `{ title?, done? }`    |
-| DELETE | `/todos/:id` | Delete todo and all its children        | —                      |
+| Method | Endpoint     | Description                             | Body                                        |
+| ------ | ------------ | --------------------------------------- | ------------------------------------------- |
+| GET    | `/todos`     | Get all root todos with nested children | —                                           |
+| POST   | `/todos`     | Create todo or subtask                  | `{ title, parentId?, dueDate?, priority? }` |
+| PATCH  | `/todos/:id` | Update todo                             | `{ title?, done?, dueDate?, priority? }`    |
+| DELETE | `/todos/:id` | Delete todo and all its children        | —                                           |
 
-### Nested Tasks
+### Premium
 
-Todos support up to **3 levels of nesting**:
+> Requires authentication + isPremium === true
 
-```
-Level 1 (root)     parentId: null
-Level 2 (subtask)  parentId: <level 1 id>
-Level 3 (sub-sub)  parentId: <level 2 id>
-```
+| Method | Endpoint              | Description          |
+| ------ | --------------------- | -------------------- |
+| GET    | `/premium/ai-suggest` | AI suggestion (stub) |
 
-`GET /todos` returns a nested tree structure:
+---
 
-```json
-[
-  {
-    "id": 1,
-    "title": "Build Website",
-    "done": false,
-    "parentId": null,
-    "children": [
-      {
-        "id": 2,
-        "title": "Design UI",
-        "done": false,
-        "parentId": 1,
-        "children": [
-          {
-            "id": 3,
-            "title": "Create Wireframe",
-            "done": false,
-            "parentId": 2,
-            "children": []
-          }
-        ]
-      }
-    ]
-  }
-]
+## Database Schema
+
+```prisma
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  isPremium Boolean  @default(false)
+  createdAt DateTime @default(now())
+  todos     Todo[]
+}
+
+model Todo {
+  id        Int       @id @default(autoincrement())
+  title     String
+  done      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  dueDate   DateTime?
+  priority  Priority?
+
+  userId    Int
+  user      User  @relation(fields: [userId], references: [id])
+
+  parentId  Int?
+  parent    Todo?  @relation("TodoTree", fields: [parentId], references: [id])
+  children  Todo[] @relation("TodoTree")
+}
 ```
 
 ---
@@ -217,6 +254,17 @@ Register → bcrypt.hash(password) → save to DB
 Login    → bcrypt.compare → jwt.sign → set httpOnly cookie
 Request  → cookie sent automatically → authMiddleware → jwt.verify
 Logout   → clearCookie → redirect to login
+```
+
+---
+
+## Middleware Chain
+
+```
+Request
+  └── authMiddleware       → verify JWT, attach req.user
+        └── requirePremium → check isPremium === true
+              └── controller
 ```
 
 ---
@@ -233,7 +281,7 @@ All CRUD operations follow this pattern:
    ❌ Failure → rollback to snapshot + show toast
 ```
 
-For nested state, three recursive helper functions handle tree traversal:
+Recursive helper functions handle tree traversal:
 
 | Function              | Purpose                               |
 | --------------------- | ------------------------------------- |
@@ -241,23 +289,7 @@ For nested state, three recursive helper functions handle tree traversal:
 | `replaceChildInTodo`  | Replace tempId with real server ID    |
 | `removeChildFromTodo` | Remove a node and all its descendants |
 | `toggleInTree`        | Update a node's fields at any depth   |
-
----
-
-## Database Schema
-
-```prisma
-model Todo {
-  id        Int      @id @default(autoincrement())
-  title     String
-  done      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  parentId  Int?
-  parent    Todo?  @relation("TodoTree", fields: [parentId], references: [id])
-  children  Todo[] @relation("TodoTree")
-}
-```
+| `filterTree`          | Filter tree by query and status       |
 
 ---
 
