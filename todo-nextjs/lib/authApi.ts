@@ -2,7 +2,7 @@ import axios from "axios";
 
 // one instance of axios with default config, can be used in all auth api calls
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
   withCredentials: true, //must include, otherwise cookie not sent
 });
 
