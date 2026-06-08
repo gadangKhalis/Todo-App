@@ -2,6 +2,8 @@
 
 A fullstack Todo application with JWT authentication, nested task support, premium system, filter & search, and due date & priority management. Built with Express + TypeScript (backend) and Next.js App Router (frontend).
 
+🌐 **Live Demo**: [todo-app-ruby-beta-32.vercel.app](https://todo-app-ruby-beta-32.vercel.app)
+
 ---
 
 ## Tech Stack
@@ -15,6 +17,7 @@ A fullstack Todo application with JWT authentication, nested task support, premi
 - **Database**: PostgreSQL
 - **Auth**: JWT + bcrypt
 - **Cookie**: cookie-parser (httpOnly cookie)
+- **Hosting**: Railway
 
 ### Frontend (`todo-nextjs`)
 
@@ -22,6 +25,7 @@ A fullstack Todo application with JWT authentication, nested task support, premi
 - **Language**: TypeScript
 - **HTTP Client**: Axios
 - **Styling**: CSS Modules
+- **Hosting**: Vercel
 
 ---
 
@@ -76,6 +80,16 @@ A fullstack Todo application with JWT authentication, nested task support, premi
 - ✅ Loading state — items dim during pending operations
 - ✅ Auto-focus — input refocuses after submit
 - ✅ Double submit prevention with `isCreating` flag
+
+---
+
+## Deployment
+
+| Service  | Platform | URL |
+| -------- | -------- | --- |
+| Frontend | Vercel   | [todo-app-ruby-beta-32.vercel.app](https://todo-app-ruby-beta-32.vercel.app) |
+| Backend  | Railway  | [todo-app-production-d3fa.up.railway.app](https://todo-app-production-d3fa.up.railway.app) |
+| Database | Railway PostgreSQL | — |
 
 ---
 
@@ -173,6 +187,17 @@ npm start          # production
 ```bash
 cd todo-nextjs
 npm install
+```
+
+Create `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+Start frontend server:
+
+```bash
 npm run dev        # development (port 3001)
 ```
 
@@ -182,12 +207,12 @@ npm run dev        # development (port 3001)
 
 ### Auth
 
-| Method | Endpoint         | Description                      | Body                  | Auth |
-| ------ | ---------------- | -------------------------------- | --------------------- | ---- |
-| POST   | `/auth/register` | Register new user                | `{ email, password }` | —    |
-| POST   | `/auth/login`    | Login, set httpOnly cookie       | `{ email, password }` | —    |
-| POST   | `/auth/logout`   | Logout, clear cookie             | —                     | —    |
-| GET    | `/auth/me`       | Get current user + isPremium     | —                     | ✅   |
+| Method | Endpoint         | Description                  | Body                  | Auth |
+| ------ | ---------------- | ---------------------------- | --------------------- | ---- |
+| POST   | `/auth/register` | Register new user            | `{ email, password }` | —    |
+| POST   | `/auth/login`    | Login, set httpOnly cookie   | `{ email, password }` | —    |
+| POST   | `/auth/logout`   | Logout, clear cookie         | —                     | —    |
+| GET    | `/auth/me`       | Get current user + isPremium | —                     | ✅   |
 
 ### Todos
 
@@ -301,6 +326,12 @@ Recursive helper functions handle tree traversal:
 | -------------- | --------------------------------- |
 | `DATABASE_URL` | Prisma database connection string |
 | `JWT_SECRET`   | Secret key for signing JWT tokens |
+
+### `todo-nextjs/.env.local`
+
+| Variable               | Description              |
+| ---------------------- | ------------------------ |
+| `NEXT_PUBLIC_API_URL`  | Backend API base URL     |
 
 ---
 
