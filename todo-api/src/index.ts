@@ -10,7 +10,11 @@ import premiumRoutes from "./routes/premium.routes";
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:3001", "https://todo-app-sandy-seven-23.vercel.app",] //NextJS port
+    origin: [
+      "http://localhost:3001",
+      "https://todo-app-sandy-seven-23.vercel.app",
+      "https://todo-app-ruby-beta-32.vercel.app",
+    ],
     credentials: true, // must be, so cookie can be sent cross-origin
   }),
 );
