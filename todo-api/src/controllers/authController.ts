@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
+import { AuthRequest } from "../middlewares/authMiddlewares";
 
 const prisma = new PrismaClient();
 
@@ -55,16 +56,16 @@ const login = async (req: Request, res: Response) => {
   // Sent token via HTTPOnly cookie
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 1000,
+    secure: true,
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res.json({ message: "Login Success" });
 };
 
 export const getMe = async (req: Request, res: Response) => {
-  const userId = (req as any).userId;
+  const userId = (req as unknown as AuthRequest).user?.userId;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
