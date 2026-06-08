@@ -11,12 +11,14 @@ interface TodoFormProps {
   ) => void;
   isCreating: boolean;
   placeholder?: string;
+  className?: string;
 }
 
 export default function TodoForm({
   onSubmit,
   isCreating,
   placeholder,
+  className,
 }: TodoFormProps) {
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -37,7 +39,7 @@ export default function TodoForm({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-        placeholder={"placeholder" ?? "Add Todo...."}
+        placeholder={"Add Todo...."}
         disabled={isCreating}
       />
 

@@ -1,6 +1,6 @@
 import styles from "./UpgradeModal.module.css";
 
-export default function UpgradeModal({ onClose }) {
+export default function UpgradeModal({ onClose }: { onClose: () => void }) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.box} onClick={(e) => e.stopPropagation()}>

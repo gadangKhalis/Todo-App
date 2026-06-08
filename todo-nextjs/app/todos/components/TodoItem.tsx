@@ -9,6 +9,8 @@ interface Todo {
   done: boolean;
   parentId: number | null;
   children: Todo[];
+  dueDate: string | null;
+  priority: "LOW" | "MEDIUM" | "HIGH" | null;
 }
 
 function isOverdue(dueDate: string | null, done: boolean): boolean {

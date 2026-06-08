@@ -22,7 +22,7 @@ interface Todo {
   parentId: number | null;
   children: Todo[];
   dueDate: string | null;
-  priority: "LOW" | "MEDIUM" | "HIGH";
+  priority: "LOW" | "MEDIUM" | "HIGH" | null;
 }
 
 // add child to todo (recursive)
@@ -171,7 +171,7 @@ export default function TodosPage() {
       parentId: parentId ?? null,
       children: [],
       dueDate: dueDate ?? null,
-      priority: priority ?? null,
+      priority: (priority as "LOW" | "MEDIUM" | "HIGH" | null) ?? null,
     };
     if (parentId) {
       setTodos((prev) => addChildToTodo(prev, parentId, tempTodo));

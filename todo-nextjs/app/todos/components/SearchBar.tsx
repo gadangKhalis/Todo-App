@@ -1,6 +1,11 @@
 import styles from "./SearchBar.module.css";
 
-export default function SearchBar({ value, onChange }) {
+interface SearchBarProps {
+  value: string;
+  onChange: (filter: string) => void;
+}
+
+export default function SearchBar({ value, onChange }: SearchBarProps) {
   return (
     <div className={styles.wrapper}>
       <span className={styles.icon}>🔍</span>

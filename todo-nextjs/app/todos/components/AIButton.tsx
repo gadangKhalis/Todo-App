@@ -1,6 +1,11 @@
 import styles from "./AIButton.module.css";
 
-export default function AIButton({ isPremium, onLocked }) {
+interface AIButtonProps {
+  isPremium: boolean;
+  onLocked: () => void;
+}
+
+export default function AIButton({ isPremium, onLocked }: AIButtonProps) {
   if (isPremium) {
     return (
       <button
